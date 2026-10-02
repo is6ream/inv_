@@ -106,10 +106,13 @@ p{margin:0}
 /* venue / guests / rsvp */
 .map{width:100%;height:260px;background:var(--mist);border:1px solid var(--line);overflow:hidden}
 .map iframe{display:block;width:100%;height:100%;border:0}
-.guests{display:grid;grid-template-columns:28px minmax(0,1fr);gap:18px 14px;text-align:left;width:100%}
-.guests svg{stroke:var(--accent)}
-.guests div{display:flex;flex-direction:column;min-width:0}
-.guests small{font-size:.85rem;color:var(--ash);line-height:1.5}
+.guests{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;width:100%}
+.gi{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;text-align:center}
+.gi .wash{position:absolute;top:14px;left:50%;width:74px;height:60px;margin-left:-30px;background:var(--accent);opacity:.12;border-radius:58% 42% 63% 37%/48% 61% 39% 52%;filter:blur(9px);transform:rotate(-12deg);pointer-events:none}
+.gi svg{position:relative;width:76px;height:76px;margin-bottom:4px;fill:none;stroke:var(--accent);stroke-width:1.1;stroke-linecap:round;stroke-linejoin:round}
+.gi svg .soft{opacity:.5}
+.gi .gt{position:relative;font-family:var(--f-display);font-size:1.25rem;line-height:1.2}
+.gi small{position:relative;font-size:.85rem;color:var(--ash);line-height:1.5}
 .form{display:flex;flex-direction:column;gap:12px;width:100%;text-align:left}
 .form label{font-size:.8rem;color:var(--ash);display:flex;flex-direction:column;gap:4px}
 .form input{font:inherit;color:var(--ink);background:transparent;border:0;border-bottom:1px solid var(--line);padding:8px 0;border-radius:0}
@@ -156,6 +159,9 @@ textarea:focus{outline:none;border-color:var(--accent)}
 :root[data-motion="mid"] .bird.b2{animation-duration:12s;animation-delay:-4s}
 :root[data-motion="mid"] .arch .outline path{stroke-dasharray:1600;animation:draw 2.6s ease-out both}
 :root[data-motion="mid"] .scene.seen>*:not(.bird):not(.meadow){animation:rise .9s ease-out both}
+:root[data-motion="mid"] .scene.seen .gi svg path{stroke-dasharray:1;animation:ink 2.2s .35s ease-out both}
+:root[data-motion="mid"] .scene.seen .gi + .gi svg path{animation-delay:.75s}
+@keyframes ink{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -258,10 +264,29 @@ textarea:focus{outline:none;border-color:var(--accent)}
   <section class="scene" aria-label="Для гостей">
     <h2>Для гостей</h2>
     <div class="guests">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.2" aria-hidden="true"><path d="M8 3l4 3 4-3 4 4-3 3v11H7V10L4 7z"></path></svg>
-      <div><span>Дресс-код</span><small>Скромная закрытая одежда, спокойные светлые тона</small></div>
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.2" aria-hidden="true"><path d="M4 21V11a8 8 0 0 1 16 0v10M2 21h20M12 3V1"></path></svg>
-      <div><span>Посещение мечети</span><small>Женщинам — покрытая голова</small></div>
+      <div class="gi">
+        <span class="wash" aria-hidden="true"></span>
+        <svg viewBox="0 0 64 64" aria-hidden="true">
+          <path pathLength="1" d="M28 10Q32 13 36 10L42 13Q46 22 49 34L45 35Q42 27 40 20C41 35 45 48 48 56Q32 59.5 16 56C19 48 23 35 24 20Q22 27 19 35L15 34Q18 22 22 13Z"/>
+          <path pathLength="1" class="soft" d="M32 21C31.5 33 30.5 45 29.5 57M36.5 30C37.5 40 39 49 41 57"/>
+          <path pathLength="1" class="soft" d="M53 60Q55.5 53 53.5 46M54.2 52.5Q57.5 51 58 47Q54.5 48 54.2 52.5M53.6 56Q50.5 55.5 49.5 52Q53 52.5 53.6 56"/>
+        </svg>
+        <span class="gt">Дресс-код</span>
+        <small>Скромная закрытая одежда, спокойные светлые тона</small>
+      </div>
+      <div class="gi">
+        <span class="wash" aria-hidden="true"></span>
+        <svg viewBox="0 0 64 64" aria-hidden="true">
+          <path pathLength="1" d="M21 54V36H43V54M21 36C19 28 26 23 32 18C38 23 45 28 43 36M32 18V13"/>
+          <path pathLength="1" d="M33.6 7.2A3 3 0 1 0 33.6 12.8A2.4 2.4 0 1 1 33.6 7.2Z"/>
+          <path pathLength="1" d="M29 54V47Q32 42 35 47V54"/>
+          <path pathLength="1" d="M12 54V27M16 54V27M11 27L14 19L17 27ZM10.5 33H17.5M48 54V27M52 54V27M47 27L50 19L53 27ZM46.5 33H53.5"/>
+          <path pathLength="1" class="soft" d="M24.5 44V40.5Q26 38.5 27.5 40.5V44M36.5 44V40.5Q38 38.5 39.5 40.5V44"/>
+          <path pathLength="1" class="soft" d="M5 56Q18 54.6 32 56T59 56"/>
+        </svg>
+        <span class="gt">Посещение мечети</span>
+        <small>Женщинам — покрытая голова</small>
+      </div>
     </div>
     <p class="it" style="margin-top:6px">Ваше присутствие и ваши дуа — лучший подарок для нас</p>
   </section>
