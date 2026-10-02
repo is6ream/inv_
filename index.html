@@ -89,10 +89,6 @@ p{margin:0}
 .bigdate{display:flex;align-items:center;gap:16px;font-family:var(--f-display)}
 .bigdate .d{font-weight:300;font-size:6.4rem;line-height:.9;padding:0 16px;border-inline:1px solid var(--line)}
 .bigdate .s{font-size:1.3rem;letter-spacing:.06em}
-.count{display:flex;gap:22px;font-family:var(--f-display);font-variant-numeric:tabular-nums}
-.count div{display:flex;flex-direction:column;align-items:center}
-.count b{font-weight:400;font-size:2rem;line-height:1}
-.count span{font-family:var(--f-text);font-size:.7rem;color:var(--ash)}
 .cal{display:grid;grid-template-columns:repeat(7,36px);gap:4px;font-size:.8rem;font-variant-numeric:tabular-nums;color:var(--ash)}
 .cal span{height:32px;display:flex;align-items:center;justify-content:center}
 .cal .h{font-size:.65rem;letter-spacing:.1em;text-transform:uppercase}
@@ -246,13 +242,7 @@ textarea:focus{outline:none;border-color:var(--accent)}
     <div>начало в <b style="color:var(--accent);font-weight:500">15:00</b> <span class="todo">уточнить</span></div>
     <div class="muted it" style="font-size:.85rem">5 джумада-ль-уля 1448 г. х.</div>
 
-    <div class="count" id="timerCount" aria-label="До никаха осталось">
-      <div><b id="cD">--</b><span>дней</span></div>
-      <div><b id="cH">--</b><span>часов</span></div>
-      <div><b id="cM">--</b><span>минут</span></div>
-      <div><b id="cS">--</b><span>секунд</span></div>
-    </div>
-    <div id="timerCal" hidden>
+    <div id="timerCal">
       <div class="eyebrow" style="margin-bottom:8px">Октябрь 2026</div>
       <div class="cal" id="cal" aria-label="Календарь октября 2026, отмечено 16 число"></div>
     </div>
@@ -378,11 +368,6 @@ textarea:focus{outline:none;border-color:var(--accent)}
           <label><input type="radio" name="accent" value="rose">Пыльная роза</label>
           <label><input type="radio" name="accent" value="blue">Голубой</label>
         </div></fieldset>
-        <fieldset><legend>Таймер</legend><div class="opts">
-          <label><input type="radio" name="timer" value="count" checked>Обратный отсчёт</label>
-          <label><input type="radio" name="timer" value="cal">Календарь</label>
-          <label><input type="radio" name="timer" value="none">Только дата</label>
-        </div></fieldset>
         <fieldset><legend>Как гости отвечают</legend><div class="opts">
           <label><input type="radio" name="rsvp" value="msgr" checked>Мессенджеры</label>
           <label><input type="radio" name="rsvp" value="form">Форма</label>
@@ -421,18 +406,6 @@ textarea:focus{outline:none;border-color:var(--accent)}
   const root = document.documentElement;
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  // Countdown to 16.10.2026 15:00 (Уфа, +05:00)
-  const target = new Date('2026-10-16T15:00:00+05:00').getTime();
-  const pad = (n) => String(n).padStart(2, '0');
-  const tick = () => {
-    let s = Math.max(0, Math.floor((target - Date.now()) / 1000));
-    $('#cD').textContent = Math.floor(s / 86400); s %= 86400;
-    $('#cH').textContent = pad(Math.floor(s / 3600)); s %= 3600;
-    $('#cM').textContent = pad(Math.floor(s / 60));
-    $('#cS').textContent = pad(s % 60);
-  };
-  tick(); setInterval(tick, 1000);
-
   // October 2026 starts on Thursday
   const cal = $('#cal');
   ['пн','вт','ср','чт','пт','сб','вс'].forEach((d) => { const e = document.createElement('span'); e.className = 'h'; e.textContent = d; cal.append(e); });
@@ -442,7 +415,6 @@ textarea:focus{outline:none;border-color:var(--accent)}
   const LABELS = {
     cover: ['Обложка', { meadow: 'Луг', arch: 'Арка' }],
     accent: ['Акцент', { sage: 'Шалфей', rose: 'Пыльная роза', blue: 'Голубой' }],
-    timer: ['Таймер', { count: 'Обратный отсчёт', cal: 'Календарь', none: 'Только дата' }],
     rsvp: ['Ответ гостей', { msgr: 'Мессенджеры', form: 'Форма', both: 'Форма + мессенджер' }],
     map: ['Карта', { img: 'Карта и кнопки', btns: 'Только кнопки' }],
     music: ['Музыка', { off: 'Без музыки', btn: 'Нашид по кнопке' }],
@@ -456,8 +428,6 @@ textarea:focus{outline:none;border-color:var(--accent)}
     $('#coverMeadow').hidden = val('cover') !== 'meadow';
     $('#coverArch').hidden = val('cover') !== 'arch';
     root.dataset.accent = val('accent');
-    $('#timerCount').hidden = val('timer') !== 'count';
-    $('#timerCal').hidden = val('timer') !== 'cal';
     const r = val('rsvp');
     $('#rsvpForm').hidden = r === 'msgr';
     $('#rsvpMsgr').hidden = r !== 'msgr';
@@ -522,7 +492,7 @@ textarea:focus{outline:none;border-color:var(--accent)}
     const STAGGER = 0.12;
     const BLOCKS = '.scene:not(.cover) > :not(.bird):not(.meadow):not(.wash2)';
     const PRESETS = [['.scene:not(.cover) > .ar', 'ink'], ['.scene:not(.cover) > .vrule', 'line-y'], ['.scene:not(.cover) > .names, .bigdate', 'zoom']];
-    const GROUPS = [['.parents', '> div', 1], ['.count', '> div', 1], ['.program', '> *', 2], ['.guests', '> .gi', 1], ['.row2', '> .btn', 1], ['#rsvpMsgr', '> .btn', 1]];
+    const GROUPS = [['.parents', '> div', 1], ['.program', '> *', 2], ['.guests', '> .gi', 1], ['.row2', '> .btn', 1], ['#rsvpMsgr', '> .btn', 1]];
 
     document.querySelectorAll(BLOCKS).forEach((el) => { el.dataset.st = 'up'; });
     for (const [sel, type] of PRESETS) document.querySelectorAll(sel).forEach((el) => { el.dataset.st = type; });
