@@ -120,6 +120,11 @@ p{margin:0}
 .note{font-size:.85rem;color:var(--ash);text-align:center}
 
 /* final */
+.verse{overflow:hidden;overflow:clip}
+.verse>:not(.wash2):not(.bird){position:relative}
+.orn{width:180px;height:40px;fill:none;stroke:var(--accent);stroke-width:1;stroke-linecap:round;stroke-linejoin:round;margin-bottom:4px}
+.wash2{position:absolute;top:90px;left:0;right:0;margin:auto;width:300px;height:200px;background:var(--accent);opacity:.07;border-radius:46% 54% 57% 43%/52% 44% 56% 48%;filter:blur(18px);pointer-events:none}
+.strip{width:calc(100% + 48px);height:170px;margin:4px -24px -72px;background-position:center 18%;-webkit-mask-image:radial-gradient(ellipse 62% 100% at 50% 100%,#000 42%,transparent 100%);mask-image:radial-gradient(ellipse 62% 100% at 50% 100%,#000 42%,transparent 100%);pointer-events:none}
 .final{padding-bottom:300px}
 .final .meadow{position:absolute;left:-24px;right:-24px;bottom:0;height:300px}
 
@@ -166,7 +171,10 @@ textarea:focus{outline:none;border-color:var(--accent)}
 :root.st[data-motion="mid"] [data-st="ink"]:not(.st-in){clip-path:inset(-40% 0 -40% 100%)}
 :root.st[data-motion="mid"] [data-st="line-y"]{transform-origin:top}
 :root.st[data-motion="mid"] [data-st="line-y"]:not(.st-in){transform:scaleY(0)}
-:root.st[data-motion="mid"] .gi svg path{stroke-dasharray:1;stroke-dashoffset:1}
+:root.st[data-motion="mid"] .gi svg path,:root.st[data-motion="mid"] .orn>*{stroke-dasharray:1;stroke-dashoffset:1}
+:root.st[data-motion="mid"] .orn.st-in>*{animation:ink 1.8s ease-out both}
+:root.st[data-motion="mid"] .orn.st-in>:nth-child(2){animation-delay:.9s}
+:root.st[data-motion="mid"] .orn.st-in>:nth-child(n+3){animation-delay:.35s}
 :root.st[data-motion="mid"] .gi.st-in svg path{animation:ink 2.2s calc(var(--d,0s) + .3s) ease-out both}
 @keyframes ink{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
@@ -207,7 +215,15 @@ textarea:focus{outline:none;border-color:var(--accent)}
   </section>
 
   <!-- Аят и имена -->
-  <section class="scene" aria-label="Аят и имена">
+  <section class="scene verse" aria-label="Аят и имена">
+    <span class="wash2" aria-hidden="true"></span>
+    <div class="bird k1 b2" style="top:22px;right:8px;width:52px" aria-hidden="true"></div>
+    <svg class="orn" viewBox="0 0 180 40" aria-hidden="true">
+      <path pathLength="1" d="M12 20H64M116 20H168"/>
+      <path pathLength="1" d="M4 20L8 16L12 20L8 24ZM168 20L172 16L176 20L172 24Z"/>
+      <path pathLength="1" d="M79 9H101V31H79ZM90 4.4L105.6 20L90 35.6L74.4 20Z"/>
+      <circle pathLength="1" cx="90" cy="20" r="4.5"/>
+    </svg>
     <div class="ar" lang="ar" style="font-size:1.4rem">وَمِنْ آيَاتِهِ أَنْ خَلَقَ لَكُم مِّنْ أَنفُسِكُمْ أَزْوَاجًا لِّتَسْكُنُوا إِلَيْهَا وَجَعَلَ بَيْنَكُم مَّوَدَّةً وَرَحْمَةً</div>
     <p class="it" style="font-size:.95rem;color:var(--ash)">«Среди Его знамений — то, что Он сотворил из вас самих жён для вас, чтобы вы находили в них успокоение, и установил между вами любовь и милосердие»</p>
     <div class="eyebrow">Сура ар-Рум, 30:21</div>
@@ -219,6 +235,7 @@ textarea:focus{outline:none;border-color:var(--accent)}
       <div><span class="muted">Родители жениха</span><span>Рустам и Светлана</span></div>
       <div><span class="muted">Родители невесты</span><span>Альмир и Лилия</span></div>
     </div>
+    <div class="meadow strip" aria-hidden="true"></div>
   </section>
 
   <!-- Дата -->
@@ -503,7 +520,7 @@ textarea:focus{outline:none;border-color:var(--accent)}
   const isMid = () => root.dataset.motion === 'mid';
   if ('IntersectionObserver' in window) {
     const STAGGER = 0.12;
-    const BLOCKS = '.scene:not(.cover) > :not(.bird):not(.meadow)';
+    const BLOCKS = '.scene:not(.cover) > :not(.bird):not(.meadow):not(.wash2)';
     const PRESETS = [['.scene:not(.cover) > .ar', 'ink'], ['.scene:not(.cover) > .vrule', 'line-y'], ['.scene:not(.cover) > .names, .bigdate', 'zoom']];
     const GROUPS = [['.parents', '> div', 1], ['.count', '> div', 1], ['.program', '> *', 2], ['.guests', '> .gi', 1], ['.row2', '> .btn', 1], ['#rsvpMsgr', '> .btn', 1]];
 
