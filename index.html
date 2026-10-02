@@ -65,15 +65,20 @@ p{margin:0}
 .row2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;width:100%}
 
 /* cover */
-.cover{min-height:820px;padding:80px 24px 0;justify-content:flex-start}
+.cover{padding:48px 24px 0;justify-content:flex-start}
 .cover .meadow{position:absolute;left:0;right:0;bottom:0;height:380px;-webkit-mask-image:linear-gradient(to top,transparent,#000 22%);mask-image:linear-gradient(to top,transparent,#000 22%)}
 .cover-names{font-family:var(--f-display);font-weight:300;font-size:3.7rem;line-height:.95;display:flex;flex-direction:column;align-items:center}
 .cover-names .amp{font-size:1.9rem;margin:2px 0}
 .date-line{font-family:var(--f-display);font-size:1.4rem;letter-spacing:.05em}
 .hint{position:absolute;left:0;right:0;bottom:40px;font-size:.75rem;font-style:italic;color:var(--ink);z-index:2}
 .arch{position:relative;width:min(300px,82vw);height:560px;margin-top:22px}
+.cover-in{display:flex;flex-direction:column;align-items:center;gap:16px;width:100%}
 .arch .outline{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
-.arch .outline path{fill:none;stroke:var(--accent);stroke-width:1;opacity:.6}
+.arch .outline .edge{fill:none;stroke:var(--accent);stroke-width:1;opacity:.6}
+.arch .outline .edge-in{fill:none;stroke:var(--accent);stroke-width:.6;opacity:.35}
+.arch .outline .band{fill:var(--accent);opacity:.06}
+.arch .outline .motif{fill:var(--accent);opacity:.75}
+.arch .outline .motif .hole{fill:var(--fog);opacity:1}
 .arch .inner{position:absolute;inset:12px 12px 0;border-radius:200px 200px 0 0;overflow:hidden;background:var(--mist);display:flex;flex-direction:column;align-items:center;gap:12px;padding-top:120px}
 .arch .inner .meadow{position:absolute;left:-40px;right:-40px;bottom:0;height:300px}
 .arch .cover-names{font-size:3.1rem;position:relative}
@@ -158,7 +163,25 @@ textarea:focus{outline:none;border-color:var(--accent)}
 @keyframes rise{from{transform:translateY(14px)}to{transform:none}}
 :root[data-motion="mid"] .bird{animation:drift 9s ease-in-out infinite}
 :root[data-motion="mid"] .bird.b2{animation-duration:12s;animation-delay:-4s}
-:root[data-motion="mid"] .arch .outline path{stroke-dasharray:1600;animation:draw 2.6s ease-out both}
+/* Обложка «оживает» при первом показе: контур от вершины вниз, орнамент по полосе, свет в арке, надписи */
+:root.st[data-motion="mid"] #coverArch .edge,:root.st[data-motion="mid"] #coverArch .edge-in{stroke-dasharray:1px 1px;stroke-dashoffset:0px;transition:stroke-dashoffset 2.3s cubic-bezier(.45,0,.2,1) .3s}
+:root.st[data-motion="mid"] #coverArch .edge-in{transition-delay:.7s}
+:root.st[data-motion="mid"] #coverArch:not(.alive) .edge,:root.st[data-motion="mid"] #coverArch:not(.alive) .edge-in{stroke-dashoffset:1px}
+:root.st[data-motion="mid"] #coverArch .band{transition:opacity 1.6s var(--ease) 1.4s}
+:root.st[data-motion="mid"] #coverArch:not(.alive) .band{opacity:0}
+:root.st[data-motion="mid"] #coverArch .motif>g>g{transform-box:fill-box;transform-origin:center;transition:transform .7s cubic-bezier(.34,1.56,.64,1) var(--d,0s),opacity .5s ease var(--d,0s)}
+:root.st[data-motion="mid"] #coverArch:not(.alive) .motif>g>g{transform:scale(0) rotate(-60deg);opacity:0}
+:root.st[data-motion="mid"] #coverArch .inner{clip-path:inset(0 0 0 0);transition:clip-path 1.9s cubic-bezier(.65,0,.35,1) 1s,opacity 1.2s ease 1s}
+:root.st[data-motion="mid"] #coverArch:not(.alive) .inner{clip-path:inset(100% 0 0 0);opacity:.4}
+:root.st[data-motion="mid"] #coverArch .inner .meadow{transition:transform 2.4s var(--ease) 1.5s,opacity 2s ease 1.5s}
+:root.st[data-motion="mid"] #coverArch:not(.alive) .inner .meadow{transform:translateY(60px);opacity:0}
+:root.st[data-motion="mid"] #coverArch .inner .bird{transition:opacity 1.4s ease 3.1s,scale 1.6s var(--ease) 3.1s}
+:root.st[data-motion="mid"] #coverArch:not(.alive) .inner .bird{opacity:0;scale:.55}
+:root.st[data-motion="mid"] #coverArch .intro{transition:opacity 1.2s var(--ease) var(--d,0s),transform 1.4s var(--ease) var(--d,0s),filter 1.2s ease var(--d,0s)}
+:root.st[data-motion="mid"] #coverArch:not(.alive) .intro{opacity:0;transform:translateY(16px);filter:blur(4px)}
+:root.st[data-motion="mid"] #coverArch .cover-names .intro{display:inline-block}
+:root.st[data-motion="mid"] #coverArch .intro-line{transition:transform 1.2s var(--ease) var(--d,0s)}
+:root.st[data-motion="mid"] #coverArch:not(.alive) .intro-line{transform:scaleX(0)}
 /* scroll-trigger: начальное состояние есть только при JS (.st) и режиме «средние» */
 :root.st[data-motion="mid"] [data-st]{transition:opacity 1s var(--ease),transform 1.1s var(--ease),clip-path 1.6s cubic-bezier(.65,0,.35,1);transition-delay:var(--d,0s)}
 :root.st[data-motion="mid"] [data-st="up"]:not(.st-in){opacity:0;transform:translateY(28px)}
@@ -180,32 +203,21 @@ textarea:focus{outline:none;border-color:var(--accent)}
 
 <div class="wrap" id="top">
 
-  <!-- Обложка A: луг -->
-  <section class="scene cover" id="coverMeadow" aria-label="Приглашение на никах">
-    <div class="meadow" aria-hidden="true"></div>
-    <div class="bird" style="top:170px;right:16px;width:78px" aria-hidden="true"></div>
-    <div class="bird k3 b2" style="top:300px;left:16px;width:48px" aria-hidden="true"></div>
-    <div class="ar" lang="ar" style="font-weight:700;font-size:1.7rem">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
-    <div class="rule"></div>
-    <div class="eyebrow" style="margin-top:14px">Приглашение на никах</div>
-    <h1 class="cover-names" style="margin:0"><span>Данил</span><span class="amp">и</span><span>Амилия</span></h1>
-    <div class="date-line">пятница · 16 октября 2026</div>
-    <div class="muted it" style="font-size:.85rem">5 джумада-ль-уля 1448 г. х.</div>
-    <div class="hint">листайте вниз</div>
-  </section>
-
-  <!-- Обложка B: арка -->
-  <section class="scene cover" id="coverArch" style="padding-top:48px;min-height:auto;padding-bottom:0" aria-label="Приглашение на никах" hidden>
-    <div class="ar" lang="ar" style="font-weight:700;font-size:1.5rem">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
-    <div class="arch">
-      <svg class="outline" viewBox="0 0 300 560" preserveAspectRatio="none" aria-hidden="true"><path d="M0.5 560 V150 A149.5 149.5 0 0 1 299.5 150 V560"></path></svg>
-      <div class="inner">
-        <div class="meadow" aria-hidden="true"></div>
-        <div class="bird k1" style="top:58px;right:30px;width:60px" aria-hidden="true"></div>
-        <div class="eyebrow">Приглашение на никах</div>
-        <h1 class="cover-names" style="margin:0"><span>Данил</span><span class="amp">и</span><span>Амилия</span></h1>
-        <div class="rule" style="width:40px"></div>
-        <div class="date-line">16 · 10 · 2026</div>
+  <!-- Обложка: арка -->
+  <section class="scene cover" id="coverArch" aria-label="Приглашение на никах">
+    <div class="cover-in">
+      <div class="ar intro" lang="ar" style="font-weight:700;font-size:1.5rem;--d:0s">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
+      <div class="arch" id="arch">
+        <!-- Контур и орнаментальная полоса: геометрию строит скрипт под реальную ширину -->
+        <svg class="outline" id="archSvg" aria-hidden="true"></svg>
+        <div class="inner">
+          <div class="meadow" aria-hidden="true"></div>
+          <div class="bird k1" style="top:58px;right:30px;width:60px" aria-hidden="true"></div>
+          <div class="eyebrow intro" style="--d:2s">Приглашение на никах</div>
+          <h1 class="cover-names" style="margin:0"><span class="intro" style="--d:2.25s">Данил</span><span class="amp intro" style="--d:2.55s">и</span><span class="intro" style="--d:2.75s">Амилия</span></h1>
+          <div class="rule intro-line" style="width:40px;--d:3.1s"></div>
+          <div class="date-line intro" style="--d:3.3s">16 · 10 · 2026</div>
+        </div>
       </div>
     </div>
   </section>
@@ -359,10 +371,6 @@ textarea:focus{outline:none;border-color:var(--accent)}
     </header>
     <form id="prefs">
       <div style="display:flex;flex-direction:column;gap:22px">
-        <fieldset><legend>Обложка</legend><div class="opts">
-          <label><input type="radio" name="cover" value="meadow" checked>Луг</label>
-          <label><input type="radio" name="cover" value="arch">Арка</label>
-        </div></fieldset>
         <fieldset><legend>Цвет акцента</legend><div class="opts">
           <label><input type="radio" name="accent" value="sage" checked>Шалфей</label>
           <label><input type="radio" name="accent" value="rose">Пыльная роза</label>
@@ -413,7 +421,6 @@ textarea:focus{outline:none;border-color:var(--accent)}
   for (let d = 1; d <= 31; d++) { const e = document.createElement('span'); e.textContent = d; if (d === 16) e.className = 'on'; cal.append(e); }
 
   const LABELS = {
-    cover: ['Обложка', { meadow: 'Луг', arch: 'Арка' }],
     accent: ['Акцент', { sage: 'Шалфей', rose: 'Пыльная роза', blue: 'Голубой' }],
     rsvp: ['Ответ гостей', { msgr: 'Мессенджеры', form: 'Форма', both: 'Форма + мессенджер' }],
     map: ['Карта', { img: 'Карта и кнопки', btns: 'Только кнопки' }],
@@ -425,8 +432,6 @@ textarea:focus{outline:none;border-color:var(--accent)}
   const val = (n) => form.elements[n].value;
 
   const apply = () => {
-    $('#coverMeadow').hidden = val('cover') !== 'meadow';
-    $('#coverArch').hidden = val('cover') !== 'arch';
     root.dataset.accent = val('accent');
     const r = val('rsvp');
     $('#rsvpForm').hidden = r === 'msgr';
@@ -435,7 +440,6 @@ textarea:focus{outline:none;border-color:var(--accent)}
     $('#mapImg').hidden = val('map') !== 'img';
     $('#music').hidden = val('music') !== 'btn';
     root.dataset.motion = reduce ? 'calm' : val('motion');
-    if (val('cover') === 'arch') { const p = $('.arch .outline path'); p.style.animation = 'none'; void p.getBBox(); p.style.animation = ''; }
     updateMsg();
   };
 
@@ -486,6 +490,70 @@ textarea:focus{outline:none;border-color:var(--accent)}
     catch (e) { const r = document.createRange(); r.selectNodeContents($('#msgPreview')); const s = getSelection(); s.removeAllRanges(); s.addRange(r); say('Текст выделен, скопируйте его вручную'); }
   });
 
+  // Арка: контур, внутренняя линия и орнамент в полосе между ними.
+  // Строим в пикселях под реальную ширину, чтобы дуга оставалась окружностью на любом телефоне.
+  const arch = $('#arch'), archSvg = $('#archSvg');
+  const NS = 'http://www.w3.org/2000/svg';
+  const mk = (tag, attrs, parent) => { const n = document.createElementNS(NS, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); parent.append(n); return n; };
+  // Половина арки от вершины вниз: dir = -1 левая, 1 правая
+  const half = (c, r, H, dir) => `M${c} ${c - r} A${r} ${r} 0 0 ${dir < 0 ? 0 : 1} ${c + dir * r} ${c} V${H}`;
+  const motifRosette = (g) => {   // четырёхлепестковая розетка
+    for (let i = 0; i < 4; i++) mk('ellipse', { cx: 0, cy: -2, rx: 1.15, ry: 2, transform: `rotate(${i * 90 + 45})` }, g);
+    mk('circle', { r: 1.05, class: 'hole' }, g);
+    mk('circle', { r: .55 }, g);
+  };
+  const motifBud = (g) => {       // ромб-бутон с точками по сторонам
+    mk('path', { d: 'M0 -2.6 L1.5 0 L0 2.6 L-1.5 0Z' }, g);
+    mk('circle', { cx: 0, cy: -4.3, r: .55 }, g);
+    mk('circle', { cx: 0, cy: 4.3, r: .55 }, g);
+  };
+  let archW = 0;
+  const buildArch = () => {
+    const W = arch.clientWidth, H = arch.clientHeight;
+    if (!W || W === archW) return;
+    archW = W;
+    archSvg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    archSvg.innerHTML = '';
+    const c = W / 2, rOut = c - .5, rIn = c - 12, rMid = c - 6.25;
+    // мягкая заливка полосы
+    mk('path', { class: 'band', 'fill-rule': 'evenodd', d:
+      `M.5 ${H} V${c} A${rOut} ${rOut} 0 0 1 ${W - .5} ${c} V${H} Z M12 ${H} V${c} A${rIn} ${rIn} 0 0 1 ${W - 12} ${c} V${H} Z` }, archSvg);
+    for (const dir of [-1, 1]) {
+      mk('path', { class: 'edge', d: half(c, rOut, H, dir), pathLength: 1 }, archSvg);
+      mk('path', { class: 'edge-in', d: half(c, rIn, H, dir), pathLength: 1 }, archSvg);
+    }
+    // орнамент: розетки и бутоны по средней линии полосы, от вершины вниз
+    const motifs = mk('g', { class: 'motif' }, archSvg);
+    const STEP = 15;
+    for (const dir of [-1, 1]) {
+      const guide = mk('path', { d: half(c, rMid, H, dir), fill: 'none' }, archSvg);
+      const L = guide.getTotalLength();
+      for (let d = dir < 0 ? 0 : STEP, i = dir < 0 ? 0 : 1; d < L - 6; d += STEP, i++) {
+        if (dir > 0 && d < 1) continue;
+        const p = guide.getPointAtLength(d), q = guide.getPointAtLength(Math.min(L, d + .5));
+        const ang = Math.atan2(q.y - p.y, q.x - p.x) * 180 / Math.PI;
+        const pos = mk('g', { transform: `translate(${p.x.toFixed(2)} ${p.y.toFixed(2)}) rotate(${ang.toFixed(1)})` }, motifs);
+        const g = mk('g', {}, pos);
+        g.style.setProperty('--d', (.45 + (d / L) * 2.2).toFixed(2) + 's');
+        (i % 2 === 0 ? motifRosette : motifBud)(g);
+      }
+      guide.remove();
+    }
+  };
+  // Режим анимаций включаем до построения арки, чтобы контур и орнамент стартовали скрытыми
+  root.dataset.motion = reduce ? 'calm' : val('motion');
+  if ('IntersectionObserver' in window) root.classList.add('st');
+  buildArch();
+  addEventListener('resize', buildArch, { passive: true });
+
+  // Оживление обложки — один раз, когда арка впервые видна
+  const cover = $('#coverArch');
+  const wake = () => requestAnimationFrame(() => requestAnimationFrame(() => cover.classList.add('alive')));
+  if ('IntersectionObserver' in window) {
+    const coverIo = new IntersectionObserver((en) => { if (en[0].isIntersecting) { wake(); coverIo.disconnect(); } }, { threshold: .25 });
+    coverIo.observe(cover);
+  } else wake();
+
   // Scroll-trigger: появление по входу в экран + привязанный к скроллу параллакс
   const isMid = () => root.dataset.motion === 'mid';
   if ('IntersectionObserver' in window) {
@@ -524,7 +592,7 @@ textarea:focus{outline:none;border-color:var(--accent)}
   // Scrub: птицы плывут медленнее текста, обложка мягко растворяется при уходе вверх.
   // Свойство translate не конфликтует с transform-анимациями птиц.
   const birds = [...document.querySelectorAll('.bird')].map((el) => ({ el, sec: el.closest('.scene'), k: el.classList.contains('b2') ? 0.10 : 0.18 }));
-  const coverParts = [...document.querySelectorAll('#coverMeadow > :not(.bird):not(.meadow)')];
+  const coverParts = [document.querySelector('#coverArch .cover-in')];
   let ticking = false;
   const scrub = () => {
     ticking = false;
