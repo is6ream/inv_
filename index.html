@@ -164,21 +164,21 @@ textarea:focus{outline:none;border-color:var(--accent)}
 :root[data-motion="mid"] .bird{animation:drift 9s ease-in-out infinite}
 :root[data-motion="mid"] .bird.b2{animation-duration:12s;animation-delay:-4s}
 /* Обложка «оживает» при первом показе: контур от вершины вниз, орнамент по полосе, свет в арке, надписи */
-:root.st[data-motion="mid"] #coverArch .edge,:root.st[data-motion="mid"] #coverArch .edge-in{stroke-dasharray:1px 1px;stroke-dashoffset:0px;transition:stroke-dashoffset 2.3s cubic-bezier(.45,0,.2,1) .3s}
-:root.st[data-motion="mid"] #coverArch .edge-in{transition-delay:.7s}
+:root.st[data-motion="mid"] #coverArch .edge,:root.st[data-motion="mid"] #coverArch .edge-in{stroke-dasharray:1px 1px;stroke-dashoffset:0px;transition:stroke-dashoffset 1.9s cubic-bezier(.45,0,.2,1) .15s}
+:root.st[data-motion="mid"] #coverArch .edge-in{transition-delay:.45s}
 :root.st[data-motion="mid"] #coverArch:not(.alive) .edge,:root.st[data-motion="mid"] #coverArch:not(.alive) .edge-in{stroke-dashoffset:1px}
-:root.st[data-motion="mid"] #coverArch .band{transition:opacity 1.6s var(--ease) 1.4s}
+:root.st[data-motion="mid"] #coverArch .band{transition:opacity 1.2s var(--ease) 1.1s}
 :root.st[data-motion="mid"] #coverArch:not(.alive) .band{opacity:0}
 :root.st[data-motion="mid"] #coverArch .motif>g>g{transform-box:fill-box;transform-origin:center;transition:transform .7s cubic-bezier(.34,1.56,.64,1) var(--d,0s),opacity .5s ease var(--d,0s)}
 :root.st[data-motion="mid"] #coverArch:not(.alive) .motif>g>g{transform:scale(0) rotate(-60deg);opacity:0}
-:root.st[data-motion="mid"] #coverArch .inner{clip-path:inset(0 0 0 0);transition:clip-path 1.9s cubic-bezier(.65,0,.35,1) 1s,opacity 1.2s ease 1s}
+:root.st[data-motion="mid"] #coverArch .inner{clip-path:inset(0 0 0 0);transition:clip-path 1.6s cubic-bezier(.65,0,.35,1) .8s,opacity 1s ease .8s}
 :root.st[data-motion="mid"] #coverArch:not(.alive) .inner{clip-path:inset(100% 0 0 0);opacity:.4}
-:root.st[data-motion="mid"] #coverArch .inner .meadow{transition:transform 2.4s var(--ease) 1.5s,opacity 2s ease 1.5s}
+:root.st[data-motion="mid"] #coverArch .inner .meadow{transition:transform 2s var(--ease) 1.1s,opacity 1.6s ease 1.1s}
 :root.st[data-motion="mid"] #coverArch:not(.alive) .inner .meadow{transform:translateY(60px);opacity:0}
-:root.st[data-motion="mid"] #coverArch .inner .bird{transition:opacity 1.4s ease 3.1s,scale 1.6s var(--ease) 3.1s}
+:root.st[data-motion="mid"] #coverArch .inner .bird{transition:opacity 1.4s ease 4.1s,scale 1.6s var(--ease) 4.1s}
 :root.st[data-motion="mid"] #coverArch:not(.alive) .inner .bird{opacity:0;scale:.55}
-:root.st[data-motion="mid"] #coverArch .intro{transition:opacity 1.2s var(--ease) var(--d,0s),transform 1.4s var(--ease) var(--d,0s),filter 1.2s ease var(--d,0s)}
-:root.st[data-motion="mid"] #coverArch:not(.alive) .intro{opacity:0;transform:translateY(16px);filter:blur(4px)}
+:root.st[data-motion="mid"] #coverArch .intro{transition:opacity 1.3s ease var(--d,0s),transform 1.8s cubic-bezier(.16,1,.3,1) var(--d,0s),filter 1.5s ease var(--d,0s)}
+:root.st[data-motion="mid"] #coverArch:not(.alive) .intro{opacity:0;transform:scale(.78);filter:blur(10px)}
 :root.st[data-motion="mid"] #coverArch .cover-names .intro{display:inline-block}
 :root.st[data-motion="mid"] #coverArch .intro-line{transition:transform 1.2s var(--ease) var(--d,0s)}
 :root.st[data-motion="mid"] #coverArch:not(.alive) .intro-line{transform:scaleX(0)}
@@ -206,17 +206,17 @@ textarea:focus{outline:none;border-color:var(--accent)}
   <!-- Обложка: арка -->
   <section class="scene cover" id="coverArch" aria-label="Приглашение на никах">
     <div class="cover-in">
-      <div class="ar intro" lang="ar" style="font-weight:700;font-size:1.5rem;--d:0s">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
+      <div class="ar intro" lang="ar" style="font-weight:700;font-size:1.5rem;--d:2.5s">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
       <div class="arch" id="arch">
         <!-- Контур и орнаментальная полоса: геометрию строит скрипт под реальную ширину -->
         <svg class="outline" id="archSvg" aria-hidden="true"></svg>
         <div class="inner">
           <div class="meadow" aria-hidden="true"></div>
           <div class="bird k1" style="top:58px;right:30px;width:60px" aria-hidden="true"></div>
-          <div class="eyebrow intro" style="--d:2s">Приглашение на никах</div>
-          <h1 class="cover-names" style="margin:0"><span class="intro" style="--d:2.25s">Данил</span><span class="amp intro" style="--d:2.55s">и</span><span class="intro" style="--d:2.75s">Амилия</span></h1>
-          <div class="rule intro-line" style="width:40px;--d:3.1s"></div>
-          <div class="date-line intro" style="--d:3.3s">16 · 10 · 2026</div>
+          <div class="eyebrow intro" style="--d:2.85s">Приглашение на никах</div>
+          <h1 class="cover-names" style="margin:0"><span class="intro" style="--d:3.1s">Данил</span><span class="amp intro" style="--d:3.4s">и</span><span class="intro" style="--d:3.55s">Амилия</span></h1>
+          <div class="rule intro-line" style="width:40px;--d:3.95s"></div>
+          <div class="date-line intro" style="--d:4.05s">16 · 10 · 2026</div>
         </div>
       </div>
     </div>
@@ -534,7 +534,7 @@ textarea:focus{outline:none;border-color:var(--accent)}
         const ang = Math.atan2(q.y - p.y, q.x - p.x) * 180 / Math.PI;
         const pos = mk('g', { transform: `translate(${p.x.toFixed(2)} ${p.y.toFixed(2)}) rotate(${ang.toFixed(1)})` }, motifs);
         const g = mk('g', {}, pos);
-        g.style.setProperty('--d', (.45 + (d / L) * 2.2).toFixed(2) + 's');
+        g.style.setProperty('--d', (.3 + (d / L) * 1.8).toFixed(2) + 's');
         (i % 2 === 0 ? motifRosette : motifBud)(g);
       }
       guide.remove();
