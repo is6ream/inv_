@@ -341,7 +341,7 @@ textarea:focus{outline:none;border-color:var(--accent)}
 
 </div>
 
-<audio id="nasheed" src="nasheed.mp3" preload="none" loop></audio>
+<audio id="nasheed" src="nasheed.mp3" preload="auto" loop></audio>
 <button class="music" id="music" type="button" aria-label="Включить нашид" aria-pressed="false" hidden>
   <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><path d="M7 14V3l8-2v11"></path><circle cx="5" cy="14" r="2"></circle><circle cx="13" cy="12" r="2"></circle></svg>
 </button>
@@ -379,9 +379,9 @@ textarea:focus{outline:none;border-color:var(--accent)}
           <label><input type="radio" name="map" value="btns">Только кнопки</label>
         </div></fieldset>
         <fieldset><legend>Музыка</legend><div class="opts">
-          <label><input type="radio" name="music" value="off" checked>Без музыки</label>
-          <label><input type="radio" name="music" value="btn">Нашид по кнопке</label>
-        </div><div class="hintline">Кнопка появится в правом верхнем углу. Нажмите её, чтобы послушать нашид</div></fieldset>
+          <label><input type="radio" name="music" value="off">Без музыки</label>
+          <label><input type="radio" name="music" value="btn" checked>Нашид (включается сам)</label>
+        </div><div class="hintline">Нашид плавно включается при открытии или при первом касании страницы. Выключить его можно кнопкой в правом верхнем углу</div></fieldset>
         <fieldset><legend>Анимации</legend><div class="opts">
           <label><input type="radio" name="motion" value="calm">Тихие</label>
           <label><input type="radio" name="motion" value="mid" checked>Средние</label>
@@ -408,15 +408,33 @@ textarea:focus{outline:none;border-color:var(--accent)}
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // Nasheed: plays only by button, quieter than full volume, pauses when the tab is hidden
+  // Fade-in and a lower level are baked into nasheed.mp3: iOS ignores audio.volume
   const audio = $('#nasheed');
-  audio.volume = 0.6;
+  let userOff = false;    // guest switched the nasheed off: never restart it on their behalf
+  let resumeOnShow = false;
   const setPlaying = (on) => {
     const b = $('#music');
     b.setAttribute('aria-pressed', String(on));
     b.setAttribute('aria-label', on ? 'Выключить нашид' : 'Включить нашид');
   };
   function stopMusic() { audio.pause(); setPlaying(false); }
-  document.addEventListener('visibilitychange', () => { if (document.hidden) stopMusic(); });
+  const musicAllowed = () => !userOff && document.querySelector('input[name="music"]:checked')?.value === 'btn';
+  // Browsers may block sound until the first tap; then we simply wait for that tap
+  function startMusic() {
+    if (!musicAllowed() || !audio.paused) return;
+    audio.play().then(() => setPlaying(true)).catch(() => setPlaying(false));
+  }
+  const GESTURES = ['pointerdown', 'touchend', 'keydown'];
+  const onFirstGesture = (e) => {
+    if (e.target.closest && e.target.closest('#music')) return; // the button handles itself
+    startMusic();
+  };
+  GESTURES.forEach((t) => addEventListener(t, onFirstGesture, { capture: true, passive: true }));
+  audio.addEventListener('playing', () => GESTURES.forEach((t) => removeEventListener(t, onFirstGesture, { capture: true })), { once: true });
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) { resumeOnShow = !audio.paused; stopMusic(); }
+    else if (resumeOnShow) { resumeOnShow = false; startMusic(); }
+  });
 
   // October 2026 starts on Thursday
   const cal = $('#cal');
@@ -428,7 +446,7 @@ textarea:focus{outline:none;border-color:var(--accent)}
     accent: ['Акцент', { sage: 'Шалфей', rose: 'Пыльная роза', blue: 'Голубой' }],
     rsvp: ['Ответ гостей', { msgr: 'Мессенджеры', form: 'Форма', both: 'Форма + мессенджер' }],
     map: ['Карта', { img: 'Карта и кнопки', btns: 'Только кнопки' }],
-    music: ['Музыка', { off: 'Без музыки', btn: 'Нашид по кнопке' }],
+    music: ['Музыка', { off: 'Без музыки', btn: 'Нашид (включается сам)' }],
     motion: ['Анимации', { calm: 'Тихие', mid: 'Средние' }],
   };
 
@@ -443,7 +461,7 @@ textarea:focus{outline:none;border-color:var(--accent)}
     $('#rsvpAlt').hidden = r !== 'both';
     $('#mapImg').hidden = val('map') !== 'img';
     $('#music').hidden = val('music') !== 'btn';
-    if (val('music') !== 'btn') stopMusic();
+    if (val('music') !== 'btn') stopMusic(); else startMusic();
     root.dataset.motion = reduce ? 'calm' : val('motion');
     updateMsg();
   };
@@ -489,8 +507,10 @@ textarea:focus{outline:none;border-color:var(--accent)}
   $('#rsvpForm').addEventListener('submit', (e) => { e.preventDefault(); say('Так гость увидит: «Спасибо, ваш ответ записан». В тесте ничего не сохраняется'); });
   $('#music').addEventListener('click', () => {
     if (audio.paused) {
+      userOff = false;
       audio.play().then(() => setPlaying(true)).catch(() => { setPlaying(false); say('Не удалось включить звук, попробуйте ещё раз'); });
     } else {
+      userOff = true;
       stopMusic();
     }
   });
