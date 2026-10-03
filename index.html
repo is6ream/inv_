@@ -396,7 +396,6 @@ html.locked,html.locked body{overflow:hidden}
     $('#rsvpForm').hidden = r === 'msgr';
     $('#rsvpMsgr').hidden = r !== 'msgr';
     $('#rsvpAlt').hidden = r !== 'both';
-    $('#mapImg').hidden = val('map') !== 'img';
     $('#music').hidden = !opened || val('music') !== 'btn';
     if (val('music') !== 'btn') stopMusic(); else startMusic();
     root.dataset.motion = reduce ? 'calm' : val('motion');
