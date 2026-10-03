@@ -361,7 +361,8 @@ html.locked,html.locked body{overflow:hidden}
     b.setAttribute('aria-label', on ? 'Выключить нашид' : 'Включить нашид');
   };
   function stopMusic() { audio.pause(); setPlaying(false); }
-  const musicAllowed = () => !userOff;
+  let opened = false;     // до нажатия «Открыть приглашение» нашид молчит
+  const musicAllowed = () => opened && !userOff;
   // Browsers may block sound until the first tap; then we simply wait for that tap
   function startMusic() {
     if (!musicAllowed() || !audio.paused) return;
@@ -396,7 +397,7 @@ html.locked,html.locked body{overflow:hidden}
     $('#rsvpMsgr').hidden = r !== 'msgr';
     $('#rsvpAlt').hidden = r !== 'both';
     $('#mapImg').hidden = val('map') !== 'img';
-    $('#music').hidden = val('music') !== 'btn';
+    $('#music').hidden = !opened || val('music') !== 'btn';
     if (val('music') !== 'btn') stopMusic(); else startMusic();
     root.dataset.motion = reduce ? 'calm' : val('motion');
   };
@@ -488,6 +489,7 @@ html.locked,html.locked body{overflow:hidden}
   const splash = $('#splash');
   root.classList.add('locked');
   $('#enter').addEventListener('click', () => {
+    opened = true;
     userOff = false;
     audio.currentTime = 0;
     audio.play().then(() => setPlaying(true)).catch(() => setPlaying(false));
