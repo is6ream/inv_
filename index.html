@@ -162,15 +162,19 @@ textarea:focus{outline:none;border-color:var(--accent)}
 .preview{font-size:.8rem;white-space:pre-wrap;background:var(--fog);border:1px dashed var(--line);padding:10px 12px;color:var(--ash)}
 
 /* motion: only when "средние" chosen and allowed */
-@keyframes drift{0%,100%{transform:translate(0,0) rotate(0)}50%{transform:translate(-10px,-8px) rotate(-3deg)}}
+/* Птицы летят туда, куда смотрят, петляя и наклоняясь; flutter — частое «дыхание» крыльев */
+@keyframes flyL{0%,100%{transform:translate(0,0) rotate(0)}20%{transform:translate(-14px,-11px) rotate(-6deg)}42%{transform:translate(-28px,-3px) rotate(-1deg)}62%{transform:translate(-18px,9px) rotate(5deg)}82%{transform:translate(-5px,5px) rotate(2deg)}}
+@keyframes flyR{0%,100%{transform:translate(0,0) rotate(0)}20%{transform:translate(14px,-11px) rotate(6deg)}42%{transform:translate(28px,-3px) rotate(1deg)}62%{transform:translate(18px,9px) rotate(-5deg)}82%{transform:translate(5px,5px) rotate(-2deg)}}
+@keyframes flutter{0%,100%{scale:1 1}50%{scale:1.025 .94}}
 @keyframes draw{from{stroke-dashoffset:1600}to{stroke-dashoffset:0}}
 @keyframes rise{from{transform:translateY(14px)}to{transform:none}}
-:root[data-motion="mid"] .bird{animation:drift 9s ease-in-out infinite}
+:root[data-motion="mid"] .bird{animation:flyL 7s ease-in-out infinite,flutter .45s ease-in-out infinite}
+:root[data-motion="mid"] .bird.k3{animation-name:flyR,flutter}
 /* Цветы покачиваются как от лёгкого ветра: низ на месте, верхушки чуть отклоняются */
 @keyframes sway{0%,100%{transform:skewX(0deg)}28%{transform:skewX(1.3deg)}55%{transform:skewX(-.4deg)}78%{transform:skewX(-1deg)}}
 :root[data-motion="mid"] .arch .inner .meadow,:root[data-motion="mid"] .verse .meadow{transform-origin:50% 100%;animation:sway 9s ease-in-out infinite}
 :root[data-motion="mid"] .verse .meadow{animation-duration:11s;animation-delay:-4s}
-:root[data-motion="mid"] .bird.b2{animation-duration:12s;animation-delay:-4s}
+:root[data-motion="mid"] .bird.b2{animation-duration:8.5s,.52s;animation-delay:-3s,-.2s}
 /* Обложка «оживает» при первом показе: контур от вершины вниз, орнамент по полосе, свет в арке, надписи */
 :root.st[data-motion="mid"] #coverArch .edge,:root.st[data-motion="mid"] #coverArch .edge-in{stroke-dasharray:1px 1px;stroke-dashoffset:0px;transition:stroke-dashoffset 2.6s cubic-bezier(.37,0,.2,1) .3s}
 :root.st[data-motion="mid"] #coverArch .edge-in{transition-delay:.55s}
@@ -385,7 +389,7 @@ textarea:focus{outline:none;border-color:var(--accent)}
         <fieldset><legend>Анимации</legend><div class="opts">
           <label><input type="radio" name="motion" value="calm">Тихие</label>
           <label><input type="radio" name="motion" value="mid" checked>Средние</label>
-        </div><div class="hintline">Средние: блоки появляются по мере прокрутки, аяты проявляются справа налево, иконки прорисовываются, птицы плывут с параллаксом</div></fieldset>
+        </div><div class="hintline">Средние: блоки появляются по мере прокрутки, аяты проявляются справа налево, иконки прорисовываются, птицы порхают и плывут с параллаксом</div></fieldset>
         <fieldset><legend><label for="comment">Что поправить</label></legend>
           <textarea id="comment" name="comment" placeholder="Текст, цвета, порядок блоков, что убрать или добавить"></textarea>
         </fieldset>
@@ -633,7 +637,7 @@ textarea:focus{outline:none;border-color:var(--accent)}
 
   // Scrub: птицы плывут медленнее текста, обложка мягко растворяется при уходе вверх.
   // Свойство translate не конфликтует с transform-анимациями птиц.
-  const birds = [...document.querySelectorAll('.bird')].map((el) => ({ el, sec: el.closest('.scene'), k: el.classList.contains('b2') ? 0.10 : 0.18 }));
+  const birds = [...document.querySelectorAll('.bird')].map((el) => ({ el, sec: el.closest('.scene'), k: el.classList.contains('b2') ? 0.16 : 0.28 }));
   const coverParts = [document.querySelector('#coverArch .cover-in')];
   let ticking = false;
   const scrub = () => {
